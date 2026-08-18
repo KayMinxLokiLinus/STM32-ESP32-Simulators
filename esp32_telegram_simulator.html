@@ -32,6 +32,12 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 .note { margin:0 0 15px; padding:10px; border-left:4px solid #d28e24; background:#fff5d9; color:#6b4a16; font:.85rem system-ui,sans-serif; }
 .pinmap { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:15px; font:.82rem system-ui,sans-serif; }
 .pinmap span { padding:7px; border-left:4px solid var(--gold); background:#fffaf0; }
+.wiring { margin-top:20px; padding:20px; background:var(--paper); border-radius:4px; }
+.wiring h2 { margin:0 0 12px; font-size:1.05rem; }
+.wire-row { display:grid; grid-template-columns:105px 1fr 105px; gap:8px; align-items:center; margin:8px 0; font:.84rem system-ui,sans-serif; }
+.wire-row span { padding:8px; background:#fffaf0; text-align:center; }
+.wire-line { height:4px; background:var(--gold); border-radius:4px; }
+.wire-note { margin:12px 0 0; color:#617068; font:.82rem system-ui,sans-serif; }
 @media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .log-panel { grid-column:auto; } .leds { gap:20px; } .led { width:64px; } }
 </style>
 </head>
@@ -58,6 +64,15 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 <h2 style="margin-top:20px">เหตุการณ์ล่าสุด</h2>
 <div id="log" class="log" aria-live="polite"></div>
 </div>
+</section>
+<section class="wiring">
+<h2>แบบจำลองการต่อวงจร ESP32 E-TECH</h2>
+<div class="wire-row"><span>GPIO18</span><i class="wire-line"></i><span>SW1</span></div>
+<div class="wire-row"><span>GPIO19</span><i class="wire-line"></i><span>SW2</span></div>
+<div class="wire-row"><span>GPIO25</span><i class="wire-line"></i><span>LED1</span></div>
+<div class="wire-row"><span>GPIO26</span><i class="wire-line"></i><span>LED2</span></div>
+<div class="wire-row"><span>WiFi</span><i class="wire-line"></i><span>Telegram API</span></div>
+<p class="wire-note">SW1 และ SW2 ต่อเข้ากับ GND แบบ INPUT_PULLUP; การเชื่อมต่อ Telegram ในหน้านี้เป็นการจำลองและไม่ส่งข้อมูลจริง</p>
 </section>
 </main>
 <script>

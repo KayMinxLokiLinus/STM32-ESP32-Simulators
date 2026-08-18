@@ -29,6 +29,12 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 .status { padding:11px; background:#e7dfcf; font-size:.9rem; }
 .pins { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:15px; font-size:.82rem; }
 .pins span { padding:7px; border-left:4px solid var(--gold); background:#fffaf0; }
+.wiring { margin-top:20px; padding:20px; background:var(--paper); border-radius:4px; }
+.wiring h2 { margin:0 0 12px; font-size:1.1rem; }
+.wire-row { display:grid; grid-template-columns:88px 1fr 92px; gap:8px; align-items:center; margin:8px 0; font:.84rem system-ui,sans-serif; }
+.wire-row span { padding:8px; background:#fffaf0; text-align:center; }
+.wire-line { height:4px; background:var(--gold); border-radius:4px; }
+.wire-note { margin:12px 0 0; color:#617068; font:.82rem system-ui,sans-serif; }
 @media (max-width:680px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } }
 </style>
 </head>
@@ -53,6 +59,15 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 <div id="status" class="status">Mode 1: แดงติดดวงเดียว</div>
 <div class="pins"><span>SW1 = PA7</span><span>RW = PB1</span><span>BL = PB8</span><span>LCD = PB0, PB2, PB4-PB7</span></div>
 </div>
+</section>
+<section class="wiring">
+<h2>แบบจำลองการต่อวงจร</h2>
+<div class="wire-row"><span>PA7</span><i class="wire-line"></i><span>SW1</span></div>
+<div class="wire-row"><span>PC10</span><i class="wire-line"></i><span>LED R</span></div>
+<div class="wire-row"><span>PC11</span><i class="wire-line"></i><span>LED G</span></div>
+<div class="wire-row"><span>PC12</span><i class="wire-line"></i><span>LED B</span></div>
+<div class="wire-row"><span>PB0/PB2</span><i class="wire-line"></i><span>LCD RS/EN</span></div>
+<p class="wire-note">SW1 ต่อระหว่าง PA7 กับ GND แบบ INPUT_PULLUP; LCD ใช้ PB4-PB7 เป็นสายข้อมูล, RW ต่อ PB1 และ BL ต่อ PB8</p>
 </section>
 </main>
 <script>
