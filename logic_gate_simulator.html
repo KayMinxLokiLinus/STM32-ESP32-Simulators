@@ -42,6 +42,17 @@ th { background:#e7dfcf; }
 .wire-line { height:4px; background:var(--gold); border-radius:4px; }
 .wire-note { margin:12px 0 0; color:#617068; font:.82rem system-ui,sans-serif; }
 .jump { display:inline-block; margin:0 0 18px; padding:10px 14px; border-radius:5px; background:var(--gold); color:#241d11; font:700 .9rem system-ui,sans-serif; text-decoration:none; }
+.circuit { position:relative; min-height:270px; padding:18px; overflow:hidden; background:#d9e2d4; border:2px solid #8ca68b; border-radius:5px; }
+.pcb { position:relative; min-height:230px; padding:18px; background:#1e654c; border:6px solid #164837; border-radius:10px; box-shadow:inset 0 0 0 2px #73b488; }
+.pcb-title { color:#d8f0c9; font:700 .78rem system-ui,sans-serif; letter-spacing:.08em; }
+.gate-chip { position:absolute; top:82px; left:42%; padding:18px 22px; background:#27343a; border:3px solid #89969a; color:#f0d48b; font:700 .78rem monospace; }
+.part-row { position:absolute; right:18px; bottom:30px; display:flex; gap:16px; }
+.part { display:grid; place-items:center; width:54px; aspect-ratio:1; border:4px solid #263238; border-radius:50%; color:white; font:700 .7rem system-ui,sans-serif; box-shadow:inset 0 -7px 8px #0006; }
+.part.red-part { background:#ef4444; } .part.green-part { background:#22c55e; } .part.blue-part { background:#3b82f6; }
+.switches { position:absolute; left:22px; bottom:30px; display:flex; gap:10px; }
+.switch { display:grid; place-items:center; width:54px; height:34px; background:#d6d9ce; border:3px solid #59635a; color:#18251f; font:700 .7rem system-ui,sans-serif; }
+.wire-svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.wire-svg path { fill:none; stroke-width:3; stroke-linecap:round; stroke-dasharray:7 5; }
 @media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .buttons { grid-template-columns:1fr; } }
 </style>
 </head>
@@ -78,6 +89,7 @@ th { background:#e7dfcf; }
 </section>
 <section id="wiring" class="wiring">
 <h2>แบบจำลองการต่อวงจร AX-NC64</h2>
+<div class="circuit"><div class="pcb"><div class="pcb-title">AX-NC64 LOGIC GATE BOARD</div><div class="gate-chip">LOGIC<br>GATE</div><div class="switches"><div class="switch">SW3<br>IN1</div><div class="switch">SW4<br>IN2</div></div><div class="part-row"><div class="part red-part">IN1<br>PC10</div><div class="part green-part">IN2<br>PC11</div><div class="part blue-part">OT<br>PC12</div></div><svg class="wire-svg" viewBox="0 0 600 230" preserveAspectRatio="none"><path d="M95 185 C190 165 300 135 395 125" stroke="#f1b24a"/><path d="M165 185 C250 170 320 145 430 125" stroke="#5ed879"/><path d="M395 125 C455 140 500 155 535 170" stroke="#5ca8ff"/></svg></div></div>
 <div class="wire-row"><span>PA7</span><i class="wire-line"></i><span>SW1 Mode</span></div>
 <div class="wire-row"><span>PA9</span><i class="wire-line"></i><span>SW3 = IN1</span></div>
 <div class="wire-row"><span>PA10</span><i class="wire-line"></i><span>SW4 = IN2</span></div>

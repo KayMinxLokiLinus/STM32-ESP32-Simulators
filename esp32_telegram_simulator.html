@@ -39,6 +39,17 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 .wire-line { height:4px; background:var(--gold); border-radius:4px; }
 .wire-note { margin:12px 0 0; color:#617068; font:.82rem system-ui,sans-serif; }
 .jump { display:inline-block; margin:0 0 18px; padding:10px 14px; border-radius:5px; background:var(--gold); color:#241d11; font:700 .9rem system-ui,sans-serif; text-decoration:none; }
+.circuit { position:relative; min-height:270px; padding:18px; overflow:hidden; background:#d9e2d4; border:2px solid #8ca68b; border-radius:5px; }
+.pcb { position:relative; min-height:230px; padding:18px; background:#1e654c; border:6px solid #164837; border-radius:10px; box-shadow:inset 0 0 0 2px #73b488; }
+.pcb-title { color:#d8f0c9; font:700 .78rem system-ui,sans-serif; letter-spacing:.08em; }
+.wifi-chip { position:absolute; top:66px; left:40%; padding:20px 26px; background:#27343a; border:3px solid #89969a; color:#9bd3ff; font:700 .78rem monospace; }
+.part-row { position:absolute; right:18px; bottom:30px; display:flex; gap:20px; }
+.part { display:grid; place-items:center; width:58px; aspect-ratio:1; border:4px solid #263238; border-radius:50%; color:white; font:700 .7rem system-ui,sans-serif; box-shadow:inset 0 -7px 8px #0006; }
+.part.red-part { background:#ef4444; } .part.blue-part { background:#3b82f6; }
+.switches { position:absolute; left:22px; bottom:30px; display:flex; gap:10px; }
+.switch { display:grid; place-items:center; width:58px; height:34px; background:#d6d9ce; border:3px solid #59635a; color:#18251f; font:700 .7rem system-ui,sans-serif; }
+.wire-svg { position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
+.wire-svg path { fill:none; stroke-width:3; stroke-linecap:round; stroke-dasharray:7 5; }
 @media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .log-panel { grid-column:auto; } .leds { gap:20px; } .led { width:64px; } }
 </style>
 </head>
@@ -69,6 +80,7 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 </section>
 <section id="wiring" class="wiring">
 <h2>แบบจำลองการต่อวงจร ESP32 E-TECH</h2>
+<div class="circuit"><div class="pcb"><div class="pcb-title">ESP32 E-TECH IOT BOARD</div><div class="wifi-chip">ESP32<br>WiFi + API</div><div class="switches"><div class="switch">SW1<br>GPIO18</div><div class="switch">SW2<br>GPIO19</div></div><div class="part-row"><div class="part red-part">LED1<br>25</div><div class="part blue-part">LED2<br>26</div></div><svg class="wire-svg" viewBox="0 0 600 230" preserveAspectRatio="none"><path d="M95 185 C200 150 300 125 390 115" stroke="#f1b24a"/><path d="M175 185 C260 160 320 135 430 115" stroke="#5ed879"/><path d="M390 115 C455 135 500 155 535 170" stroke="#ff6363"/><path d="M430 115 C475 135 520 155 580 170" stroke="#5ca8ff"/></svg></div></div>
 <div class="wire-row"><span>GPIO18</span><i class="wire-line"></i><span>SW1</span></div>
 <div class="wire-row"><span>GPIO19</span><i class="wire-line"></i><span>SW2</span></div>
 <div class="wire-row"><span>GPIO25</span><i class="wire-line"></i><span>LED1</span></div>
