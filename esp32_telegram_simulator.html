@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESP32 Telegram IoT Simulator</title>
+<style>
+:root { --ink:#17221f; --board:#263238; --paper:#f7f1e5; --gold:#e8aa43; --green:#39b86b; }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; display:grid; place-items:center; background:linear-gradient(135deg,#d8e7df,#f4dfb7); color:var(--ink); font-family:Georgia,serif; }
+.app { width:min(960px,94vw); }
+h1 { margin:0 0 8px; font-size:clamp(1.8rem,4vw,2.8rem); }
+.subtitle { margin:0 0 20px; color:#4b6158; font-family:system-ui,sans-serif; }
+.board { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:24px; background:var(--board); border:8px solid #172124; border-radius:8px; box-shadow:0 20px 45px #26323855; }
+.panel { padding:20px; background:var(--paper); border-radius:4px; }
+.panel h2 { margin:0 0 14px; font-size:1.1rem; }
+.wifi { display:flex; align-items:center; gap:10px; padding:12px; background:#e7dfcf; font:700 .92rem system-ui,sans-serif; }
+.dot { width:12px; height:12px; border-radius:50%; background:#ef4444; }
+.dot.connected { background:var(--green); box-shadow:0 0 12px var(--green); }
+.leds { display:flex; justify-content:center; gap:54px; padding:25px 0; }
+.led-item { text-align:center; font:700 .9rem system-ui,sans-serif; }
+.led { width:78px; aspect-ratio:1; margin-bottom:9px; border-radius:50%; opacity:.17; box-shadow:inset 0 -8px 12px #0005; transition:opacity .12s,box-shadow .12s; }
+.led.on { opacity:1; box-shadow:0 0 30px 10px currentColor,inset 0 -8px 12px #0005; }
+.red { color:#ef4444; background:#ef4444; } .blue { color:#3b82f6; background:#3b82f6; }
+.controls { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+button { padding:14px 10px; border:0; border-bottom:4px solid #95691d; border-radius:5px; background:var(--gold); color:#241d11; cursor:pointer; font:700 1rem system-ui,sans-serif; }
+button:active { transform:translateY(2px); border-bottom-width:2px; }
+.status { margin-top:15px; padding:11px; background:#e7dfcf; font:0.9rem system-ui,sans-serif; }
+.log-panel { grid-column:1 / -1; }
+.log { height:155px; overflow:auto; padding:12px; background:#172124; color:#d9f4dc; font:0.86rem/1.6 'Courier New',monospace; }
+.log div { border-bottom:1px solid #ffffff18; }
+.note { margin:0 0 15px; padding:10px; border-left:4px solid #d28e24; background:#fff5d9; color:#6b4a16; font:.85rem system-ui,sans-serif; }
+.pinmap { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:15px; font:.82rem system-ui,sans-serif; }
+.pinmap span { padding:7px; border-left:4px solid var(--gold); background:#fffaf0; }
+@media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .log-panel { grid-column:auto; } .leds { gap:20px; } .led { width:64px; } }
+</style>
+</head>
+<body>
+<main class="app">
+<h1>ESP32 Telegram IoT</h1>
+<p class="subtitle">แบบจำลองโค้ดควบคุม LED ผ่าน SW1 และ SW2</p>
+<section class="board">
+<div class="panel">
+<h2>ESP32 E-TECH</h2>
+<div class="wifi"><span id="wifiDot" class="dot"></span><span id="wifiText">กำลังเชื่อมต่อ WiFi...</span></div>
+<div class="leds">
+<div class="led-item"><div id="led1" class="led red"></div>LED1<br>GPIO 25</div>
+<div class="led-item"><div id="led2" class="led blue"></div>LED2<br>GPIO 26</div>
+</div>
+<div class="controls"><button id="sw1">SW1 · GPIO 18<br>สลับ LED1</button><button id="sw2">SW2 · GPIO 19<br>สลับ LED2</button></div>
+<div id="status" class="status">LED1 ปิด | LED2 ปิด</div>
+<div class="pinmap"><span>SW1 = GPIO18</span><span>SW2 = GPIO19</span><span>LED1 = GPIO25</span><span>LED2 = GPIO26</span></div>
+</div>
+<div class="panel">
+<h2>Telegram Bot</h2>
+<p class="note">โหมดจำลอง: ไม่ส่งข้อความไป Telegram จริง และไม่เก็บ token หรือรหัสผ่าน</p>
+<div class="status">Bot: <strong id="botStatus">พร้อมจำลอง</strong><br>Chat ID: ซ่อนเพื่อความปลอดภัย</div>
+<h2 style="margin-top:20px">เหตุการณ์ล่าสุด</h2>
+<div id="log" class="log" aria-live="polite"></div>
+</div>
+</section>
+</main>
+<script>
+let led1State = false;
+let led2State = false;
+let wifiConnected = false;
+const led1 = document.querySelector('#led1');
+const led2 = document.querySelector('#led2');
+const status = document.querySelector('#status');
+const log = document.querySelector('#log');
+const wifiDot = document.querySelector('#wifiDot');
+const wifiText = document.querySelector('#wifiText');
+
+function addLog(message) {
+  const row = document.createElement('div');
+  row.textContent = `[${new Date().toLocaleTimeString('th-TH')}] ${message}`;
+  log.prepend(row);
+}
+
+function updateBoard() {
+  led1.classList.toggle('on', led1State);
+  led2.classList.toggle('on', led2State);
+  status.textContent = `LED1 ${led1State ? 'เปิด' : 'ปิด'} | LED2 ${led2State ? 'เปิด' : 'ปิด'}`;
+}
+
+function sendTelegram(message) {
+  if (!wifiConnected) {
+    addLog('Telegram: ส่งไม่สำเร็จ เพราะ WiFi ยังไม่เชื่อมต่อ');
+    return;
+  }
+  addLog(`Telegram: ${message}`);
+}
+
+function connectWifi() {
+  addLog('WiFi.begin(ssid, password)');
+  setTimeout(() => {
+    wifiConnected = true;
+    wifiDot.classList.add('connected');
+    wifiText.textContent = 'WiFi connected';
+    document.querySelector('#botStatus').textContent = 'เชื่อมต่อจำลองแล้ว';
+    addLog('WiFi connected');
+    sendTelegram('ESP32 พร้อมใช้งานแล้ว (IoT Online)');
+  }, 900);
+}
+
+document.querySelector('#sw1').addEventListener('click', () => {
+  led1State = !led1State;
+  updateBoard();
+  sendTelegram(led1State ? 'LED1 เปิดแล้ว!' : 'LED1 ปิดแล้ว!');
+});
+
+document.querySelector('#sw2').addEventListener('click', () => {
+  led2State = !led2State;
+  updateBoard();
+  sendTelegram(led2State ? 'LED2 เปิดแล้ว!' : 'LED2 ปิดแล้ว!');
+});
+
+document.addEventListener('keydown', event => {
+  if (event.key.toLowerCase() === '1') document.querySelector('#sw1').click();
+  if (event.key.toLowerCase() === '2') document.querySelector('#sw2').click();
+});
+
+updateBoard();
+connectWifi();
+</script>
+</body>
+</html>

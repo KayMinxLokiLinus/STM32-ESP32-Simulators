@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STM32 Logic Gate Simulator</title>
+<style>
+:root { --ink:#18251f; --board:#263238; --paper:#f7f1e5; --lcd:#a9c58a; --gold:#e8aa43; }
+* { box-sizing:border-box; }
+body { margin:0; min-height:100vh; display:grid; place-items:center; background:linear-gradient(135deg,#d8e7df,#f4dfb7); color:var(--ink); font-family:Georgia,serif; }
+.app { width:min(980px,94vw); }
+h1 { margin:0 0 8px; font-size:clamp(1.8rem,4vw,2.8rem); }
+.subtitle { margin:0 0 20px; color:#4b6158; font-family:system-ui,sans-serif; }
+.board { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:24px; background:var(--board); border:8px solid #172124; border-radius:8px; box-shadow:0 20px 45px #26323855; }
+.panel { padding:20px; background:var(--paper); border-radius:4px; }
+.panel h2 { margin:0 0 14px; font-size:1.1rem; }
+.lcd { min-height:90px; padding:14px 12px; border:7px solid #52634b; border-radius:5px; background:var(--lcd); color:#17371e; box-shadow:inset 0 0 16px #30452866; font:700 1.18rem/1.55 'Courier New',monospace; }
+.lcd div { white-space:pre; overflow:hidden; }
+.buttons { display:grid; grid-template-columns:repeat(3,1fr); gap:9px; margin-top:20px; }
+button { padding:13px 8px; border:0; border-bottom:4px solid #95691d; border-radius:5px; background:var(--gold); color:#241d11; cursor:pointer; font:700 .9rem system-ui,sans-serif; }
+button:active { transform:translateY(2px); border-bottom-width:2px; }
+button.active { background:#83c58e; border-bottom-color:#347246; }
+.hint, .status, .pins, .truth { font-family:system-ui,sans-serif; }
+.hint { margin:12px 0 0; color:#617068; font-size:.84rem; }
+.leds { min-height:170px; display:flex; justify-content:center; align-items:center; gap:24px; }
+.led-item { text-align:center; font:700 .88rem system-ui,sans-serif; }
+.led { width:70px; aspect-ratio:1; margin-bottom:8px; border-radius:50%; opacity:.17; box-shadow:inset 0 -8px 12px #0005; transition:opacity .12s,box-shadow .12s; }
+.led.on { opacity:1; box-shadow:0 0 28px 10px currentColor,inset 0 -8px 12px #0005; }
+.red { color:#ef4444; background:#ef4444; } .green { color:#22c55e; background:#22c55e; } .blue { color:#3b82f6; background:#3b82f6; }
+.status { padding:11px; background:#e7dfcf; font-size:.9rem; }
+.pins { display:grid; grid-template-columns:1fr 1fr; gap:7px; margin-top:15px; font-size:.82rem; }
+.pins span { padding:7px; border-left:4px solid var(--gold); background:#fffaf0; }
+.truth { margin-top:20px; padding:16px 20px; background:var(--paper); border-radius:4px; }
+.truth h2 { margin:0 0 10px; font-size:1.05rem; }
+table { width:100%; border-collapse:collapse; font:0.88rem system-ui,sans-serif; }
+th, td { padding:7px; text-align:center; border-bottom:1px solid #d7cdbb; }
+th { background:#e7dfcf; }
+@media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .buttons { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+<main class="app">
+<h1>STM32 Logic Gate Simulator</h1>
+<p class="subtitle">แบบจำลองโค้ด AX-NC64 สำหรับทดลอง Logic Gate 6 โหมด</p>
+<section class="board">
+<div class="panel">
+<h2>LCD 16 × 2</h2>
+<div class="lcd" aria-live="polite"><div id="lcdMode"></div><div id="lcdValues"></div></div>
+<div class="buttons">
+<button id="sw1">SW1<br>เปลี่ยนโหมด</button>
+<button id="sw3">SW3<br>IN1 = 0</button>
+<button id="sw4">SW4<br>IN2 = 0</button>
+</div>
+<p class="hint">SW3 และ SW4 กดเพื่อสลับค่า 0/1 จำลอง INPUT_PULLUP และกด N แทน SW1</p>
+</div>
+<div class="panel">
+<h2>AX-NC64 GPIO Output</h2>
+<div class="leds">
+<div class="led-item"><div id="red" class="led red"></div>IN1<br>PC10</div>
+<div class="led-item"><div id="green" class="led green"></div>IN2<br>PC11</div>
+<div class="led-item"><div id="blue" class="led blue"></div>OUTPUT<br>PC12</div>
+</div>
+<div id="status" class="status">Mode 1: AND Gate</div>
+<div class="pins"><span>SW1 = PA7</span><span>SW3 = PA9</span><span>SW4 = PA10</span><span>LCD = PB0, PB2, PB4-PB7</span></div>
+</div>
+</section>
+<section class="truth">
+<h2>ตารางค่าปัจจุบัน</h2>
+<table><thead><tr><th>Gate</th><th>IN1</th><th>IN2</th><th>OT</th></tr></thead><tbody><tr><td id="gateName">AND</td><td id="tableIn1">0</td><td id="tableIn2">0</td><td id="tableOut">0</td></tr></tbody></table>
+</section>
+</main>
+<script>
+const gateNames = ['AND', 'OR', 'NAND', 'NOR', 'XOR', 'XNOR'];
+let count = 1;
+let in1 = false;
+let in2 = false;
+
+const lcdMode = document.querySelector('#lcdMode');
+const lcdValues = document.querySelector('#lcdValues');
+const status = document.querySelector('#status');
+const red = document.querySelector('#red');
+const green = document.querySelector('#green');
+const blue = document.querySelector('#blue');
+const sw3 = document.querySelector('#sw3');
+const sw4 = document.querySelector('#sw4');
+
+function calculateOutput() {
+  if (count === 1) return in1 && in2;
+  if (count === 2) return in1 || in2;
+  if (count === 3) return !(in1 && in2);
+  if (count === 4) return !(in1 || in2);
+  if (count === 5) return in1 !== in2;
+  return in1 === in2;
+}
+
+function render() {
+  const result = calculateOutput();
+  const gate = gateNames[count - 1];
+
+  lcdMode.textContent = `Mode${count}: ${gate}`.padEnd(16, ' ');
+  lcdValues.textContent = `IN1:${in1 ? 1 : 0} IN2:${in2 ? 1 : 0} OT:${result ? 1 : 0}`;
+  status.textContent = `Mode ${count}: ${gate} Gate | OT = ${result ? 1 : 0}`;
+
+  red.classList.toggle('on', in1);
+  green.classList.toggle('on', in2);
+  blue.classList.toggle('on', result);
+
+  sw3.textContent = `SW3\nIN1 = ${in1 ? 1 : 0}`;
+  sw4.textContent = `SW4\nIN2 = ${in2 ? 1 : 0}`;
+  sw3.classList.toggle('active', in1);
+  sw4.classList.toggle('active', in2);
+
+  document.querySelector('#gateName').textContent = gate;
+  document.querySelector('#tableIn1').textContent = in1 ? 1 : 0;
+  document.querySelector('#tableIn2').textContent = in2 ? 1 : 0;
+  document.querySelector('#tableOut').textContent = result ? 1 : 0;
+}
+
+document.querySelector('#sw1').addEventListener('click', () => {
+  count = count >= 6 ? 1 : count + 1;
+  render();
+});
+
+document.querySelector('#sw3').addEventListener('click', () => {
+  in1 = !in1;
+  render();
+});
+
+document.querySelector('#sw4').addEventListener('click', () => {
+  in2 = !in2;
+  render();
+});
+
+document.addEventListener('keydown', event => {
+  const key = event.key.toLowerCase();
+  if (key === 'n') document.querySelector('#sw1').click();
+  if (key === '1') document.querySelector('#sw3').click();
+  if (key === '2') document.querySelector('#sw4').click();
+});
+
+render();
+</script>
+</body>
+</html>
