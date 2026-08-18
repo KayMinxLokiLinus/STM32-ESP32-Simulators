@@ -7,8 +7,8 @@
 <style>
 :root { --board:#263238; --panel:#f5f1e8; --lcd:#9fbd83; --ink:#17221f; --accent:#f1b24a; }
 * { box-sizing:border-box; }
-body { margin:0; min-height:100vh; display:grid; place-items:center; color:var(--ink); background:radial-gradient(circle at 20% 10%,#fff8df 0 18%,transparent 42%),linear-gradient(135deg,#d9e3de,#a8bcb5); font-family:Georgia,serif; }
-main { width:min(940px,94vw); }
+body { margin:0; min-height:100vh; overflow-y:auto; color:var(--ink); background:radial-gradient(circle at 20% 10%,#fff8df 0 18%,transparent 42%),linear-gradient(135deg,#d9e3de,#a8bcb5); font-family:Georgia,serif; }
+main { width:min(940px,94vw); margin:0 auto; padding:28px 0; }
 h1 { margin:0 0 8px; font-size:clamp(1.8rem,4vw,3rem); letter-spacing:0; }
 .subtitle { margin:0 0 22px; font-family:system-ui,sans-serif; color:#42534d; }
 .board { display:grid; grid-template-columns:1.15fr .85fr; gap:22px; padding:26px; background:var(--board); border:8px solid #182124; border-radius:8px; box-shadow:0 18px 40px #26323855; }
@@ -34,6 +34,7 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 .wire-row span { padding:8px; background:#fffaf0; text-align:center; }
 .wire-line { height:4px; background:var(--accent); border-radius:4px; }
 .wire-note { margin:12px 0 0; color:#64736c; font:0.82rem system-ui,sans-serif; }
+.jump { display:inline-block; margin:0 0 18px; padding:10px 14px; border-radius:5px; background:var(--accent); color:#241d11; font:700 .9rem system-ui,sans-serif; text-decoration:none; }
 @media (max-width:700px) { .board { grid-template-columns:1fr; padding:16px; } .panel { padding:16px; } }
 </style>
 </head>
@@ -41,6 +42,7 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 <main>
 <h1>STM32 RGB LED Simulator</h1>
 <p class="subtitle">แบบจำลองเมนู LCD และ GPIO สำหรับทดลองกดปุ่ม</p>
+<a class="jump" href="#wiring">ดูการต่อวงจร</a>
 <section class="board" aria-label="STM32 development board simulator">
 <div class="panel">
 <h2>LCD 16 × 2</h2>
@@ -59,7 +61,7 @@ button:active { transform:translateY(2px); border-bottom-width:2px; }
 <div class="pinmap"><span>SW1: PA7</span><span>SW2: PA8</span><span>LCD RS: PB0</span><span>LCD EN: PB2</span></div>
 </div>
 </section>
-<section class="wiring">
+<section id="wiring" class="wiring">
 <h2>แบบจำลองการต่อวงจร</h2>
 <div class="wire-row"><span>PA7</span><i class="wire-line"></i><span>SW1</span></div>
 <div class="wire-row"><span>PA8</span><i class="wire-line"></i><span>SW2</span></div>

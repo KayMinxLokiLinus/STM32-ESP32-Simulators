@@ -7,8 +7,8 @@
 <style>
 :root { --ink:#18251f; --board:#263238; --paper:#f7f1e5; --lcd:#a9c58a; --gold:#e8aa43; }
 * { box-sizing:border-box; }
-body { margin:0; min-height:100vh; display:grid; place-items:center; background:linear-gradient(135deg,#d8e7df,#f4dfb7); color:var(--ink); font-family:Georgia,serif; }
-.app { width:min(980px,94vw); }
+body { margin:0; min-height:100vh; overflow-y:auto; background:linear-gradient(135deg,#d8e7df,#f4dfb7); color:var(--ink); font-family:Georgia,serif; }
+.app { width:min(980px,94vw); margin:0 auto; padding:28px 0; }
 h1 { margin:0 0 8px; font-size:clamp(1.8rem,4vw,2.8rem); }
 .subtitle { margin:0 0 20px; color:#4b6158; font-family:system-ui,sans-serif; }
 .board { display:grid; grid-template-columns:1fr 1fr; gap:20px; padding:24px; background:var(--board); border:8px solid #172124; border-radius:8px; box-shadow:0 20px 45px #26323855; }
@@ -41,6 +41,7 @@ th { background:#e7dfcf; }
 .wire-row span { padding:8px; background:#fffaf0; text-align:center; }
 .wire-line { height:4px; background:var(--gold); border-radius:4px; }
 .wire-note { margin:12px 0 0; color:#617068; font:.82rem system-ui,sans-serif; }
+.jump { display:inline-block; margin:0 0 18px; padding:10px 14px; border-radius:5px; background:var(--gold); color:#241d11; font:700 .9rem system-ui,sans-serif; text-decoration:none; }
 @media (max-width:700px) { .board { grid-template-columns:1fr; padding:15px; } .panel { padding:16px; } .buttons { grid-template-columns:1fr; } }
 </style>
 </head>
@@ -48,6 +49,7 @@ th { background:#e7dfcf; }
 <main class="app">
 <h1>STM32 Logic Gate Simulator</h1>
 <p class="subtitle">แบบจำลองโค้ด AX-NC64 สำหรับทดลอง Logic Gate 6 โหมด</p>
+<a class="jump" href="#wiring">ดูการต่อวงจร</a>
 <section class="board">
 <div class="panel">
 <h2>LCD 16 × 2</h2>
@@ -74,7 +76,7 @@ th { background:#e7dfcf; }
 <h2>ตารางค่าปัจจุบัน</h2>
 <table><thead><tr><th>Gate</th><th>IN1</th><th>IN2</th><th>OT</th></tr></thead><tbody><tr><td id="gateName">AND</td><td id="tableIn1">0</td><td id="tableIn2">0</td><td id="tableOut">0</td></tr></tbody></table>
 </section>
-<section class="wiring">
+<section id="wiring" class="wiring">
 <h2>แบบจำลองการต่อวงจร AX-NC64</h2>
 <div class="wire-row"><span>PA7</span><i class="wire-line"></i><span>SW1 Mode</span></div>
 <div class="wire-row"><span>PA9</span><i class="wire-line"></i><span>SW3 = IN1</span></div>
